@@ -50,8 +50,16 @@ class SignUpView(View):
 
             send_otp_email(user_object)
 
-            # return return(request,)
+            return redirect("verify-email")
 
-            pass
+        
 
+
+class VerifyEmailView(View):
+
+    template_name="verify_email.html"
+
+    def get(self,request,*args,**kwargs):
+
+        return render(request,self.template_name)
     
