@@ -2,11 +2,17 @@ from django.shortcuts import render,redirect
 
 from django.views.generic import View
 
-from store.forms import SignUpForm
+from store.forms import SignUpForm,LoginForm
 
 from django.core.mail import send_mail
 
 from store.models import User
+
+from django.contrib import messages
+
+from django.contrib.auth import authenticate,login
+
+from store.models import Product
 
 def send_otp_phone(otp):
 
@@ -18,7 +24,7 @@ def send_otp_phone(otp):
     from_='+15075937854',
     body=otp,
     to='+919496591658'
-    )
+)
     print(message.sid)
 
 
@@ -26,7 +32,7 @@ def send_otp_email(user):
 
     user.generate_otp()
 
-    send_otp_phone(user.otp)
+    # send_otp_phone(user.otp)
 
     subject="verify your email"
 
@@ -37,9 +43,6 @@ def send_otp_email(user):
     to_email=[user.email]
 
     send_mail(subject,message,from_email,to_email )
-
-
-
 
 
 class SignUpView(View):
@@ -74,8 +77,6 @@ class SignUpView(View):
 
         return render(request,self.template_name,{"form":form_instance})
 
-        
-
 
 class VerifyEmailView(View):
 
@@ -89,18 +90,73 @@ class VerifyEmailView(View):
 
         otp=request.POST.get("otp")
 
-        user_object=User.objects.get(otp=otp)
+        try:
 
-        user_object.is_active=True
+            user_object=User.objects.get(otp=otp)
 
-        user_object.is_verified=True
+            user_object.is_active=True
 
-        user_object.otp=None
+            user_object.is_verified=True
 
-        user_object.save()
+            user_object.otp=None
+
+            user_object.save()
+
+            return redirect("signin")
+
+        except:
+
+            messages.error(request,"invalid otp")
+
+            return render(request,self.template_name)
+
+class SignInView(View):
+
+    template_name="signin.html"
+
+    form_class=LoginForm
+
+    def get(self,request,*args,**kwargs):
+
+        form_instance=self.form_class()
+
+        return render(request,self.template_name,{"form":form_instance})
+
+    def post(self,request,*args,**kwargs):
+
+        form_data=request.POST 
+
+        form_instance=self.form_class(form_data)
+
+        if form_instance.is_valid():
+
+            uname=form_instance.cleaned_data.get("username")
+
+            pwd=form_instance.cleaned_data.get("password")
+
+            user_object=authenticate(request,username=uname,password=pwd)
+
+            if user_object:
+
+                login(request,user_object)
+
+                return redirect("product-list")
+
+        return render(request,self.template_name,{"form":form_instance})
+
+class ProductListView(View):
+
+    template_name="index.html"
+
+    def get(self,request,*args,**kwargs):
+
+        qs=Product.objects.all()
+
+        return render(request,self.template_name,{"data":qs})
 
 
-        return redirect("signup")
+
+
 
 
     
