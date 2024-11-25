@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from store import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +26,5 @@ urlpatterns = [
     path("verify/otp/",views.VerifyEmailView.as_view(),name="verify-email"),
     path("signin/",views.SignInView.as_view(),name="signin"),
     path('index/',views.ProductListView.as_view(),name="product-list"),
-]
+    path('product/<int:pk>/',views.productDetailView.as_view(),name="product-detail")
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

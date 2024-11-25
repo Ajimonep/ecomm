@@ -155,6 +155,20 @@ class ProductListView(View):
         return render(request,self.template_name,{"data":qs})
 
 
+class productDetailView(View):
+
+    template_name="product_detail.html"
+
+    def get(self,request,*args,**kwargs):
+
+        id=kwargs.get("pk")
+
+        qs=Product.objects.get(id=id)
+
+        return render(request,self.template_name,{"data":qs})
+    
+
+
 
 
 
