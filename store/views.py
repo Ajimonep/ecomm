@@ -6,7 +6,7 @@ from store.forms import SignUpForm,LoginForm
 
 from django.core.mail import send_mail
 
-from store.models import User
+from store.models import User,Size,BasketItem
 
 from django.contrib import messages
 
@@ -165,7 +165,45 @@ class productDetailView(View):
 
         qs=Product.objects.get(id=id)
 
-        return render(request,self.template_name,{"data":qs})
+        return render(request,self.template_name,{"product":qs})
+
+class AddToCartView(View):
+
+    def post(self,request,*args,**kwargs):
+
+        id=kwargs.get("pk")
+
+        size=request.POST.get("size")
+
+        quantity=request.POST.get("quantity")
+
+        product_object=Product.objects.get(id=id)
+
+        size_object=Size.objects.get(name=size)
+
+        basket_object=request.user.cart
+
+        BasketItem.objects.create(
+            product_object=product_object,
+            quantity=quantity,
+            size_object=size_object,
+            basket_object=basket_object
+        )
+
+        print("item has been added to cart")
+
+        return redirect("product-list")
+
+
+class CartSummaryView(View):
+
+    template_name="cart_summary.html"
+
+    def get(self,request,*args,**kwargs):
+
+        qs=BasketItem.objects.filter(basket_object=request.user.cart,is_order_placed=False)
+
+        return render(request,self.template_name,{"basket_items":qs})
     
 
 

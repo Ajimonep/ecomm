@@ -26,5 +26,6 @@ urlpatterns = [
     path("verify/otp/",views.VerifyEmailView.as_view(),name="verify-email"),
     path("signin/",views.SignInView.as_view(),name="signin"),
     path('index/',views.ProductListView.as_view(),name="product-list"),
-    path('product/<int:pk>/',views.productDetailView.as_view(),name="product-detail")
+    path('product/<int:pk>/',views.productDetailView.as_view(),name="product-detail"),
+    path('products/<int:pk>/cart/add/',views.AddToCartView.as_view(),name="addtocart")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
