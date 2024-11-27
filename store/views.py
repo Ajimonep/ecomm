@@ -192,7 +192,7 @@ class AddToCartView(View):
 
         print("item has been added to cart")
 
-        return redirect("product-list")
+        return redirect("cart-summary")
 
 
 class CartSummaryView(View):
@@ -203,8 +203,22 @@ class CartSummaryView(View):
 
         qs=BasketItem.objects.filter(basket_object=request.user.cart,is_order_placed=False)
 
-        return render(request,self.template_name,{"basket_items":qs})
+        basket_item_count=qs.count()
+
+        basket_total=sum([bi.item_total for bi in qs])
+
+
+        return render(request,self.template_name,{"basket_items":qs,"basket_total":basket_total,"basket_item_count":basket_item_count})
     
+class ItemDeleteView(View):
+
+
+    def get(self,request,*args,**kwargs):
+        id=kwargs.get("pk")
+
+        BasketItem.objects.get(id=id).delete()
+
+        return redirect("cart-summary")
 
 
 

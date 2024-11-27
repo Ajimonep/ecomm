@@ -115,6 +115,12 @@ class BasketItem(BaseModel):
 
     basket_object=models.ForeignKey(Basket,on_delete=models.CASCADE,related_name="cart_item")
 
+    @property
+    def item_total(self):
+
+        return self.product_object.price*self.quantity
+
+
 # Query to fetch basket item to authenticated user
 
 # BasketItem.objects.filter(basket_object__owner=request.user)
