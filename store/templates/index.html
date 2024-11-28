@@ -68,7 +68,7 @@
       </div>
   
       <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {%for p in data%}
+          {%for p in page_obj%}
           <li>
           <a href="{%url 'product-detail' p.id%}" class="group block overflow-hidden">
            {%if p.picture%}
@@ -101,6 +101,21 @@
         {%endfor%}
       </ul>
     </div>
+
   </section>
+  
+
+{%if page_obj.has_previous%}
+
+<a href="?page={{page_obj.previous_page_number}}">Previous</a>
+
+{%endif%}
+
+{%if page_obj.has_next%}
+
+<a href="?page={{page_obj.next_page_number}}">Next</a>
+
+{%endif%}
 
 {%endblock%}
+

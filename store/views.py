@@ -14,6 +14,8 @@ from django.contrib.auth import authenticate,login
 
 from store.models import Product
 
+from django.core.paginator import Paginator
+
 def send_otp_phone(otp):
 
     from twilio.rest import Client
@@ -152,7 +154,25 @@ class ProductListView(View):
 
         qs=Product.objects.all()
 
-        return render(request,self.template_name,{"data":qs})
+        paginator=Paginator(qs,4)
+
+        page_number=request.GET.get("page")
+
+        page_obj=paginator.get_page(page_number)
+
+        return render(request,self.template_name,{"page_obj":page_obj})
+
+    """
+    current page number - ?page={{page_obj.number}}
+
+    next page number - ?page={{page_obj.next_page_number}}
+
+    previous page number - ?page={{page_obj.previous_page_number}}
+
+    last page number - ?page={{page_obj.paginator.num_pages}}
+
+    
+    """
 
 
 class productDetailView(View):
@@ -212,13 +232,15 @@ class CartSummaryView(View):
     
 class ItemDeleteView(View):
 
-
     def get(self,request,*args,**kwargs):
+
         id=kwargs.get("pk")
 
         BasketItem.objects.get(id=id).delete()
 
         return redirect("cart-summary")
+
+        
 
 
 
