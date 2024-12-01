@@ -2,11 +2,11 @@ from django.shortcuts import render,redirect
 
 from django.views.generic import View
 
-from store.forms import SignUpForm,LoginForm
+from store.forms import SignUpForm,LoginForm,OrderForm
 
 from django.core.mail import send_mail
 
-from store.models import User,Size,BasketItem
+from store.models import User,Size,BasketItem,OrderItem
 
 from django.contrib import messages
 
@@ -241,6 +241,48 @@ class ItemDeleteView(View):
         return redirect("cart-summary")
 
         
+class PlaceOrderView(View):
+
+    form_class=OrderForm
+
+    template_name="order.html"
+
+    def get(self,request,*args,**kwargs):
+
+        form_instance=self.form_class()
+
+        return render(request,self.template_name,{"form":form_instance})
+
+
+    def post(self,request,*args,**kwargs):
+
+        form_data=request.POST 
+
+        form_instance=self.form_class(form_data)
+
+        if form_instance.is_valid():
+
+            form_instance.instance.customer=request.user
+
+            order_instance=form_instance.save()
+
+            basket_item=request.user.cart.cart_item.filter(is_order_placed=False)
+
+            for bi in basket_item:
+
+                OrderItem.objects.create(
+                    order_object=order_instance,
+                    product_object=bi.product_object,
+                    quantity=bi.quantity,
+                    size_object=bi.size_object,
+                    price=bi.product_object.price
+                )
+
+                bi.is_order_placed=True
+
+                bi.save()
+
+        return redirect("product-list")
 
 
 

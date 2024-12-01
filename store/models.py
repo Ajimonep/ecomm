@@ -121,6 +121,46 @@ class BasketItem(BaseModel):
         return self.product_object.price*self.quantity
 
 
+class Order(BaseModel):
+
+    customer=models.ForeignKey(User,on_delete=models.CASCADE,related_name="orders")
+
+    address=models.TextField()
+
+    phone=models.CharField(max_length=20)
+
+    PAYMENT_OPTIONS=(
+        ("COD","COD"),
+        ("ONLINE","ONLINE")
+    )
+
+    payment_method=models.CharField(max_length=15,choices=PAYMENT_OPTIONS,default="COD")
+
+    rzp_order_id=models.CharField(max_length=100,null=True)
+
+    is_paid=models.BooleanField(default=False)
+
+
+class OrderItem(BaseModel):
+
+    order_object=models.ForeignKey(
+                                   Order,on_delete=models.CASCADE,
+                                   related_name="orderitems"
+                                   )
+    
+    product_object=models.ForeignKey(Product,on_delete=models.CASCADE)
+
+    quantity=models.PositiveIntegerField(default=1)
+
+    size_object=models.ForeignKey(Size,on_delete=models.CASCADE)
+
+    price=models.FloatField()
+
+
+
+
+
+
 # Query to fetch basket item to authenticated user
 
 # BasketItem.objects.filter(basket_object__owner=request.user)
