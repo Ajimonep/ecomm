@@ -30,6 +30,9 @@ urlpatterns = [
     path('products/<int:pk>/cart/add/',views.AddToCartView.as_view(),name="addtocart"),
     path('cart/sumary/',views.CartSummaryView.as_view(),name="cart-summary"),
     path('cart/<int:pk>/summary/remove/',views.ItemDeleteView.as_view(),name="item-remove"),
-    path('order',views.PlaceOrderView.as_view(),name="placeorder")
+    path('order',views.PlaceOrderView.as_view(),name="placeorder"),
+    path('order/summary/',views.OrderSummaryView.as_view(),name="order-summary"),
+
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

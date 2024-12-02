@@ -251,7 +251,9 @@ class PlaceOrderView(View):
 
         form_instance=self.form_class()
 
-        return render(request,self.template_name,{"form":form_instance})
+        qs=request.user.cart.cart_item.filter(is_order_placed=False)
+
+        return render(request,self.template_name,{"form":form_instance,"items":qs})
 
 
     def post(self,request,*args,**kwargs):
@@ -288,5 +290,13 @@ class PlaceOrderView(View):
 
 
 
+class OrderSummaryView(View):
 
+    template_name="order_summary.html"
+
+    def get(self,request,*args,**kwargs):
+
+        qs=request.user.orders.all()
+
+        return render(request,self.template_name,{"orders":qs})
     

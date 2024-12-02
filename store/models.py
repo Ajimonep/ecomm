@@ -140,6 +140,13 @@ class Order(BaseModel):
 
     is_paid=models.BooleanField(default=False)
 
+    @property
+    def order_total(self):
+
+        total=sum([oi.item_total for oi in self.orderitems.all()])
+
+        return total
+
 
 class OrderItem(BaseModel):
 
@@ -155,6 +162,11 @@ class OrderItem(BaseModel):
     size_object=models.ForeignKey(Size,on_delete=models.CASCADE)
 
     price=models.FloatField()
+
+    @property
+    def item_total(self):
+
+        return self.price*self.quantity
 
 
 
