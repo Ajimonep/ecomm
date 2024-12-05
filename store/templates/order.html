@@ -157,22 +157,27 @@
           <!-- order summary start -->
           <h2 class="text-xl font-semibold text-gray-900 light:text-white">Order Summary</h2>
           <div class="space-y-3 border bg-white px-2 py-4 sm:px-6 shadow rounded">
-            <div class="flex flex-col rounded-lg bg-white sm:flex-row">
-              <img class="m-2 h-24 w-28 border object-cover object-center" src="https://images.unsplash.com/flagged/photo-1556637640-2c80d3201be8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8c25lYWtlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
-              <div class="flex w-full flex-col px-4 py-4">
-                <span class="font-semibold">Nike Air Max Pro 8888 - Super Light</span>
-                <span class="float-right text-gray-400">42EU - 8.5US</span>
-                <p class="text-lg font-bold">$138.99</p>
-              </div>
+
+           {% for bi in items%}
+           <div class="flex flex-col rounded-lg bg-white sm:flex-row">
+            {%if bi.product_object.picture%}
+            <img class="m-2 h-24 w-28 border object-cover object-center" 
+            src="{{bi.product_object.picture.url}}"
+            alt="" />
+
+            {%else%}
+            <img class="m-2 h-24 w-28 border object-cover object-center" src="https://images.unsplash.com/flagged/photo-1556637640-2c80d3201be8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8c25lYWtlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
+
+            {%endif%}
+            <div class="flex w-full flex-col px-4 py-4">
+              <span class="font-semibold">{{bi.product_object.title}}</span>
+              <span class="float-right text-gray-400">{{bi.size_object}} </span>
+              <p class="text-lg font-bold">${{bi.product_object.price}} </p>
             </div>
-            <div class="flex flex-col rounded-lg bg-white sm:flex-row">
-              <img class="m-2 h-24 w-28 border object-cover object-center" src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8c25lYWtlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60" alt="" />
-              <div class="flex w-full flex-col px-4 py-4">
-                <span class="font-semibold">Nike Air Max Pro 8888 - Super Light</span>
-                <span class="float-right text-gray-400">42EU - 8.5US</span>
-                <p class="mt-auto text-lg font-bold">$238.99</p>
-              </div>
-            </div>
+          </div>
+
+           {%endfor%}
+
           </div>
           <!-- order summary end -->
   
@@ -235,7 +240,7 @@
                   <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 light:border-gray-700 light:bg-gray-800">
                     <div class="flex items-start">
                       <div class="flex h-5 items-center">
-                        <input id="credit-card" name="payment_method" aria-describedby="credit-card-text" type="radio" name="payment-method" value="COD" class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 light:border-gray-600 light:bg-gray-700 light:ring-offset-gray-800 light:focus:ring-primary-600" checked />
+                        <input id="credit-card" name="payment_method" aria-describedby="credit-card-text" type="radio"  value="COD" class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 light:border-gray-600 light:bg-gray-700 light:ring-offset-gray-800 light:focus:ring-primary-600" checked />
                       </div>
       
                       <div class="ms-4 text-sm">
@@ -256,7 +261,7 @@
                   <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 light:border-gray-700 light:bg-gray-800">
                     <div class="flex items-start">
                       <div class="flex h-5 items-center">
-                        <input id="pay-on-delivery" name="payment_method" aria-describedby="pay-on-delivery-text" type="radio" name="payment-method" value="ONLINE" class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 light:border-gray-600 light:bg-gray-700 light:ring-offset-gray-800 light:focus:ring-primary-600" />
+                        <input id="pay-on-delivery" name="payment_method" aria-describedby="pay-on-delivery-text" type="radio"  value="ONLINE" class="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 light:border-gray-600 light:bg-gray-700 light:ring-offset-gray-800 light:focus:ring-primary-600" />
                       </div>
       
                       <div class="ms-4 text-sm">
@@ -295,7 +300,7 @@
             <div class="-my-3 divide-y divide-gray-200 light:divide-gray-800">
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-normal text-gray-500 light:text-gray-400">Subtotal</dt>
-                <dd class="text-base font-medium text-gray-900 light:text-white">₹8,094.00</dd>
+                <dd class="text-base font-medium text-gray-900 light:text-white">₹{{total}}</dd>
               </dl>
   
               <dl class="flex items-center justify-between gap-4 py-3">
@@ -305,17 +310,17 @@
   
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-normal text-gray-500 light:text-gray-400">Store Pickup</dt>
-                <dd class="text-base font-medium text-gray-900 light:text-white">₹99</dd>
+                <dd class="text-base font-medium text-gray-900 light:text-white">₹0</dd>
               </dl>
   
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-normal text-gray-500 light:text-gray-400">Tax</dt>
-                <dd class="text-base font-medium text-gray-900 light:text-white">₹199</dd>
+                <dd class="text-base font-medium text-gray-900 light:text-white">₹0</dd>
               </dl>
   
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-bold text-gray-900 light:text-white">Total</dt>
-                <dd class="text-base font-bold text-gray-900 light:text-white">₹8,392.00</dd>
+                <dd class="text-base font-bold text-gray-900 light:text-white">₹{{total}}</dd>
               </dl>
             </div>
 

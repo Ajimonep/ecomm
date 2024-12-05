@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4j5imy!o0lp-ah@86kk0dk$h@7y%(ccsu0(4#0q=(=y#63%9-a'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -130,7 +131,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'ajimon031@gmail.com'
-EMAIL_HOST_PASSWORD = 'lzvq uygp rmrk jqvd'
-TWILIO_RECOVERY_CODE="PD79ZVENA8N136TWVAK9ZHAA"
-TWILIO_ACCOUNT_SID="AC83ec1f17cb61816e1408a9cea6a6e1c8"
-TWILIO_AUTH_TOKEN="f5fb39f513f36a64695a1fc9117ff493"
+EMAIL_HOST_PASSWORD =config('EMAIL_HOST_PASSWORD')
+TWILIO_RECOVERY_CODE=config('TWILIO_RECOVERY_CODE')
+TWILIO_ACCOUNT_SID=config('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN=config('TWILIO_AUTH_TOKEN')

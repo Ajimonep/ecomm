@@ -6,7 +6,7 @@ from store.forms import SignUpForm,LoginForm,OrderForm
 
 from django.core.mail import send_mail
 
-from store.models import User,Size,BasketItem,OrderItem
+from store.models import User,Size,BasketItem,OrderItem,Order
 
 from django.contrib import messages
 
@@ -15,6 +15,16 @@ from django.contrib.auth import authenticate,login
 from store.models import Product
 
 from django.core.paginator import Paginator
+
+from django.views.decorators.csrf import csrf_exempt
+
+from django.utils.decorators import method_decorator
+
+from decouple import config
+
+RZP_KEY_ID=config('RZP_KEY_ID')
+
+RZP_KEY_SECRET=config('RZP_KEY_SECRET')
 
 def send_otp_phone(otp):
 
@@ -240,7 +250,9 @@ class ItemDeleteView(View):
 
         return redirect("cart-summary")
 
-        
+
+import razorpay
+
 class PlaceOrderView(View):
 
     form_class=OrderForm
@@ -253,7 +265,9 @@ class PlaceOrderView(View):
 
         qs=request.user.cart.cart_item.filter(is_order_placed=False)
 
-        return render(request,self.template_name,{"form":form_instance,"items":qs})
+        total=sum([bi.item_total for bi in qs])
+
+        return render(request,self.template_name,{"form":form_instance,"items":qs,"total":total})
 
 
     def post(self,request,*args,**kwargs):
@@ -270,6 +284,10 @@ class PlaceOrderView(View):
 
             basket_item=request.user.cart.cart_item.filter(is_order_placed=False)
 
+            payment_method=form_instance.cleaned_data.get("payment_method")
+
+            print(payment_method)
+
             for bi in basket_item:
 
                 OrderItem.objects.create(
@@ -284,10 +302,36 @@ class PlaceOrderView(View):
 
                 bi.save()
 
+            if payment_method=="ONLINE":
+
+                client = razorpay.Client(auth=(RZP_KEY_ID,RZP_KEY_SECRET))
+
+                total=sum([bi.item_total for bi in basket_item])*100
+
+                data = { "amount": total, "currency": "INR", "receipt": "order_rcptid_11" }
+
+                payment = client.order.create(data=data)
+
+                print(payment)
+
+                rzp_order_id=payment.get("id")
+
+                order_instance.rzp_order_id=rzp_order_id
+
+                order_instance.save()
+
+                context={
+                    "amount":total,
+                    "key_id":RZP_KEY_ID,
+                    "order_id":rzp_order_id,
+                    "currency":"INR"
+                }
+
+                return render(request,"payment.html",context)
+
+
+
         return redirect("product-list")
-
-
-
 
 
 class OrderSummaryView(View):
@@ -296,7 +340,38 @@ class OrderSummaryView(View):
 
     def get(self,request,*args,**kwargs):
 
-        qs=request.user.orders.all()
+        qs=request.user.orders.all().order_by("-created_date")
 
         return render(request,self.template_name,{"orders":qs})
-    
+
+
+@method_decorator([csrf_exempt],name="dispatch")
+class PaymentVerificationView(View):
+
+
+    def post(self,request,*args,**kwargs):
+
+        client = razorpay.Client(auth=(RZP_KEY_ID,RZP_KEY_SECRET))
+
+        try:
+            client.utility.verify_payment_signature(request.POST)
+            print("payment sucess")
+
+            order_id=request.POST.get("razorpay_order_id")
+
+            order_object=Order.objects.get(rzp_order_id=order_id)
+
+            order_object.is_paid=True
+
+            order_object.save()
+            
+            login(request,order_object.customer)
+            
+        except:
+            print("payment failed")
+
+        
+
+        print(request.POST)
+
+        return redirect("order-summary")
